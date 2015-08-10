@@ -5,12 +5,26 @@ const PLUS = Symbol('PLUS');
 const EOF = Symbol('EOF');
 
 const isNumber = /^[0-9]$/;
+const isWhitespace = /^\s$/;
 
 export default class Interpreter {
     constructor(text) {
         this.text = text;
         this.position = 0;
         this.currentToken = undefined;
+    }
+
+    getCurrentChar() {
+        return this.text.charAt(this.position);
+    }
+
+    hasNextChar() {
+        return this.position < this.text.length;
+    }
+
+    getNextChar() {
+        this.position++;
+        return this.getCurrentChar();
     }
 
     /**
@@ -21,13 +35,16 @@ export default class Interpreter {
     getNextToken() {
         // is this.position index past the end of the this.text ?
         // if so, then return EOF token because there is no more
-        if (this.position > this.text.length - 1) {
+        if (!this.hasNextChar()) {
             return new Token(EOF);
         }
 
-        // get a character at the position this.position and decide
-        // what token to create based on the single character
-        let currentChar = this.text.charAt(this.position);
+        let currentChar = this.getCurrentChar();
+
+        if (isWhitespace.test(currentChar)) {
+            this.position++;
+            return this.getNextToken();
+        }
 
         // if the character is a digit then convert it to
         // integer, create an INTEGER token, increment this.position
@@ -37,8 +54,7 @@ export default class Interpreter {
             let buffer = '';
             do {
                 buffer += currentChar;
-                this.position++;
-                currentChar = this.text.charAt(this.position);
+                currentChar = this.getNextChar();
             } while (isNumber.test(currentChar));
             return new Token(INTEGER, Number.parseInt(buffer, 10));
         }
@@ -74,6 +90,10 @@ export default class Interpreter {
     expr() {
         // set current token to the first token taken from the input
         this.currentToken = this.getNextToken();
+
+        if (this.currentToken.type === EOF) {
+            return undefined;
+        }
 
         // we expect the current token to be a single-digit integer
         const left = this.currentToken;
