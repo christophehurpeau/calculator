@@ -27,16 +27,20 @@ export default class Interpreter {
 
         // get a character at the position this.position and decide
         // what token to create based on the single character
-        const currentChar = this.text.charAt(this.position);
+        let currentChar = this.text.charAt(this.position);
 
         // if the character is a digit then convert it to
         // integer, create an INTEGER token, increment this.position
         // index to point to the next character after the digit,
         // and return the INTEGER token
         if (isNumber.test(currentChar)) {
-            const token = new Token(INTEGER, Number.parseInt(currentChar, 10));
-            this.position++;
-            return token;
+            let buffer = '';
+            do {
+                buffer += currentChar;
+                this.position++;
+                currentChar = this.text.charAt(this.position);
+            } while (isNumber.test(currentChar));
+            return new Token(INTEGER, Number.parseInt(buffer, 10));
         }
 
         if (currentChar === '+') {
