@@ -2,6 +2,7 @@ import Token from './Token';
 
 const INTEGER = Symbol('INTEGER');
 const PLUS = Symbol('PLUS');
+const MINUS = Symbol('MINUS');
 const EOF = Symbol('EOF');
 
 const isNumber = /^[0-9]$/;
@@ -56,29 +57,39 @@ export default class Interpreter {
                 buffer += currentChar;
                 currentChar = this.getNextChar();
             } while (isNumber.test(currentChar));
+
             return new Token(INTEGER, Number.parseInt(buffer, 10));
         }
 
         if (currentChar === '+') {
-            const token = new Token(PLUS, currentChar);
             this.position++;
-            return token;
+            return new Token(PLUS, currentChar);
+        }
+
+        if (currentChar === '-') {
+            this.position++;
+            return new Token(MINUS, currentChar);
         }
 
         throw new Error('Error parsing input at position ' + this.position);
     }
 
     /**
-     * @param {Symbol} tokenType
+     * @param {Symbol|Symbol[]} tokenTypes
      */
-    eat(tokenType) {
+    eat(tokenTypes) {
         // compare the current token type with the passed token
         // type and if they match then "eat" the current token
         // and assign the next token to the this.currentToken,
         // otherwise raise an exception.
 
-        if (this.currentToken.type !== tokenType) {
-            throw new Error('Expecting ' + tokenType.toString() + ', got ' + this.currentToken.type.toString());
+        if (!Array.isArray(tokenTypes)) {
+            tokenTypes = [tokenTypes];
+        }
+
+        if (tokenTypes.indexOf(this.currentToken.type) === -1) {
+            throw new Error('Expecting ' + tokenTypes.map(s => s.toString()).join(' or ')
+                            + ', got ' + this.currentToken.type.toString());
         }
 
         this.currentToken = this.getNextToken();
@@ -101,7 +112,7 @@ export default class Interpreter {
 
         // we expect the current token to be a '+' token
         const operation = this.currentToken;
-        this.eat(PLUS);
+        this.eat([PLUS, MINUS]);
 
         // we expect the current token to be a single-digit integer
         const right = this.currentToken;
@@ -113,7 +124,12 @@ export default class Interpreter {
         // has been successfully found and the method can just
         // return the result of adding two integers, thus
         // effectively interpreting client input
-        return left.value + right.value;
+        switch (operation.type) {
+            case PLUS:
+                return left.value + right.value;
+            case MINUS:
+                return left.value - right.value;
+        }
     }
 
 }
