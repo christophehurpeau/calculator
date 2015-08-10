@@ -1,0 +1,29 @@
+{
+  "name": "calculator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "a NodeJS calculator exercise to understand better compilators, interpreters, lexers...",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "make build",
+    "postpublish": "make post-publish",
+    "prepublish": "make pre-publish",
+    "preversion": "make pre-version",
+    "test": "make tests",
+    "version": "make version",
+    "watch": "make watch"
+  },
+  "repository": "christophehurpeau/calculator",
+  "author": "Christophe Hurpeau <christophe@hurpeau.com> (http://christophe.hurpeau.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/christophehurpeau/calculator/issues"
+  },
+  "homepage": "https://github.com/christophehurpeau/calculator#readme",
+  "devDependencies": {
+    "springbokjs-library": "^8.0.3"
+  },
+  "dependencies": {
+    "springbokjs-errors": "^2.1.0"
+  }
+}
