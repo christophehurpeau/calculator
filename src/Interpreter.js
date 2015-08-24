@@ -3,6 +3,8 @@ import Token from './Token';
 const INTEGER = Symbol('INTEGER');
 const PLUS = Symbol('PLUS');
 const MINUS = Symbol('MINUS');
+const ASTERISK = Symbol('ASTERISK');
+const SLASH = Symbol('SLASH');
 const EOF = Symbol('EOF');
 
 const isNumber = /^[0-9]$/;
@@ -68,6 +70,16 @@ export default class Interpreter {
             return new Token(MINUS, this.currentChar);
         }
 
+        if (this.currentChar === '*') {
+            this.advance();
+            return new Token(ASTERISK, this.currentChar);
+        }
+
+        if (this.currentChar === '/') {
+            this.advance();
+            return new Token(SLASH, this.currentChar);
+        }
+
         throw new Error('Error parsing input at position ' + this.position);
     }
 
@@ -109,7 +121,7 @@ export default class Interpreter {
 
         // we expect the current token to be a '+' token
         const operation = this.currentToken;
-        this.eat([PLUS, MINUS]);
+        this.eat([PLUS, MINUS, ASTERISK, SLASH]);
 
         // we expect the current token to be a single-digit integer
         const right = this.currentToken;
@@ -126,6 +138,10 @@ export default class Interpreter {
                 return left.value + right.value;
             case MINUS:
                 return left.value - right.value;
+            case ASTERISK:
+                return left.value * right.value;
+            case SLASH:
+                return left.value / right.value;
         }
     }
 
