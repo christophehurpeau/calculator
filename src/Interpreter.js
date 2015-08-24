@@ -13,19 +13,33 @@ export default class Interpreter {
         this.text = text;
         this.position = 0;
         this.currentToken = undefined;
-    }
-
-    getCurrentChar() {
-        return this.text.charAt(this.position);
+        this.currentChar = this.text.charAt(this.position);
     }
 
     hasNextChar() {
         return this.position < this.text.length;
     }
 
-    getNextChar() {
+    advance() {
         this.position++;
-        return this.getCurrentChar();
+        this.currentChar = this.text.charAt(this.position);
+        return this.currentChar;
+    }
+
+    skipWhiteSpaces() {
+        while (this.currentChar !== '' && isWhitespace.test(this.currentChar)) {
+            this.advance();
+        }
+    }
+
+    integer() {
+        let buffer = '';
+        let currentChar = this.currentChar;
+        do {
+            buffer += currentChar;
+            currentChar = this.advance();
+        } while (isNumber.test(currentChar));
+        return Number.parseInt(buffer, 10);
     }
 
     /**
@@ -34,41 +48,24 @@ export default class Interpreter {
      * apart into tokens. One token at a time.
      */
     getNextToken() {
-        // is this.position index past the end of the this.text ?
-        // if so, then return EOF token because there is no more
-        if (!this.hasNextChar()) {
+        this.skipWhiteSpaces();
+
+        if (this.currentChar === '') {
             return new Token(EOF);
         }
 
-        let currentChar = this.getCurrentChar();
-
-        if (isWhitespace.test(currentChar)) {
-            this.position++;
-            return this.getNextToken();
+        if (isNumber.test(this.currentChar)) {
+            return new Token(INTEGER, this.integer());
         }
 
-        // if the character is a digit then convert it to
-        // integer, create an INTEGER token, increment this.position
-        // index to point to the next character after the digit,
-        // and return the INTEGER token
-        if (isNumber.test(currentChar)) {
-            let buffer = '';
-            do {
-                buffer += currentChar;
-                currentChar = this.getNextChar();
-            } while (isNumber.test(currentChar));
-
-            return new Token(INTEGER, Number.parseInt(buffer, 10));
+        if (this.currentChar === '+') {
+            this.advance();
+            return new Token(PLUS, this.currentChar);
         }
 
-        if (currentChar === '+') {
-            this.position++;
-            return new Token(PLUS, currentChar);
-        }
-
-        if (currentChar === '-') {
-            this.position++;
-            return new Token(MINUS, currentChar);
+        if (this.currentChar === '-') {
+            this.advance();
+            return new Token(MINUS, this.currentChar);
         }
 
         throw new Error('Error parsing input at position ' + this.position);
