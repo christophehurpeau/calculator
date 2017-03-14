@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/christophehurpeau/calculator#readme",
   "devDependencies": {
-    "springbokjs-library": "^9.0.0"
+    "springbokjs-library": "^17.0.0"
   },
   "dependencies": {
     "springbokjs-errors": "^2.1.0"
