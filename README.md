@@ -1,5 +1,7 @@
 # calculator
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/christophehurpeau/calculator.svg)](https://greenkeeper.io/)
+
 Based on the amazing tuto: http://ruslanspivak.com/lsbasi-part1/
 
 # How to run
